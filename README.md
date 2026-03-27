@@ -31,60 +31,53 @@ RegisterNumber:  212225100048
 ```
 ```
 import pandas as pd
-import numpy as np
-import statsmodels.api as sm
-from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 import matplotlib.pyplot as plt
 
-# Load the dataset
-data = pd.read_csv("https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-ML240EN-SkillsNetwork/labs/data/CarPrice_Assignment.csv")
+data = pd.read_csv('CarPrice_Assignment.csv')
+data.head()
 
-# Data preprocessing
-# Dropping unnecessary columns and handling categorical variables
-data = data.drop(['CarName', 'car_ID'], axis=1)
-data = pd.get_dummies(data, drop_first=True)
+data = data.drop(['car_ID', 'CarName'],axis=1)
+data = pd.get_dummies(data, drop_first = True)
+data.head()
 
-# Splitting the data into features and target variable
-X = data.drop('price', axis=1)
+x = data.drop('price',axis=1)
 y = data['price']
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
-# Splitting the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Creating the model
 model = LinearRegression()
+model.fit(x_train, y_train)
 
-# Fitting the model on the training data
-model.fit(X_train, y_train)
+print("Name: DEEPAK B")
+print("Reg No: 25018314")
+print("\n===Cross Validadion===")
+cv_scores = cross_val_score(model, x, y, cv=5)
+print("Fold R2 scores:",{f"{score:.4f}"for score in cv_scores})
+print(f"Average R2: {cv_scores.mean():.4f}")
 
-# Evaluating model performance using cross-validation
-cv_scores = cross_val_score(model, X, y, cv=5)
+y_pred=model.predict(x_test)
+print("\n===Test Set Performance===")
+print(f"MSE: {mean_squared_error(y_test, y_pred):.2f}")
+print(f"R2: {r2_score(y_test, y_pred):.4f}")
+print(f"MAE: {mean_absolute_error(y_test, y_pred):.2f}")
 
-# Printing cross-validation scores
-print("Cross-validation scores:", cv_scores)
-print("Mean cross-validation score:", cv_scores.mean())
-# Print model coefficients
-print("Intercept:", model.intercept_)
-print("Coefficients:", model.coef_)
-
-# Make predictions
-predictions = model.predict(X_test)
-
-# Visualizing actual vs predicted prices
-print('Name: SATHIYA PRIYAN G')
-print('Reg No: 212225100048')
-plt.scatter(y_test, predictions)
-plt.xlabel("Actual Prices")
-plt.ylabel("Predicted Prices")
+plt.figure(figsize=(8,6))
+plt.scatter(y_test, y_pred, alpha=0.6)
+plt.plot([y.min(), y.max()], [y.min(), y.max()],'r--')
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
 plt.title("Actual vs Predicted Prices")
-plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red')  # Perfect prediction line
+plt.grid(True)
 plt.show()
+
 ```
 
 ## Output:
-![alt text](image.png)
-![alt text](image-1.png)
+<img width="633" height="239" alt="Screenshot 2026-03-27 120308" src="https://github.com/user-attachments/assets/012a4db5-ec88-468d-8b05-54dfae900bc2" />
+<img width="950" height="678" alt="Screenshot 2026-03-27 120316" src="https://github.com/user-attachments/assets/e61901cc-4908-4a85-8ec6-39bc96503913" />
+
 
 ## Result:
 Thus, the program to implement the multiple linear regression model with cross-validation for predicting car prices is written and verified using Python programming.
